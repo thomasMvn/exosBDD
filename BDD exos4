@@ -1,0 +1,257 @@
+-- MySQL Workbench Forward Engineering
+
+SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
+SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
+SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+
+-- -----------------------------------------------------
+-- Schema mydb
+-- -----------------------------------------------------
+CREATE SCHEMA IF NOT EXISTS `mydb` DEFAULT CHARACTER SET utf8 ;
+USE `mydb` ;
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Animal`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Animal` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `nom` VARCHAR(45) NOT NULL,
+  `DateNaissance` VARCHAR(45) NOT NULL,
+  `DateDeces` VARCHAR(45) NULL,
+  `IdProprietaire` INT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Chien`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Chien` (
+  `idAnimal` INT NOT NULL,
+  `taille` VARCHAR(45) NULL,
+  `poid` VARCHAR(45) NULL,
+  `idRace` VARCHAR(45) NULL,
+  PRIMARY KEY (`idAnimal`),
+  CONSTRAINT `id`
+    FOREIGN KEY (`idAnimal`)
+    REFERENCES `mydb`.`Animal` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`chat`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`chat` (
+  `idAnimal` INT NOT NULL,
+  `idRace` VARCHAR(45) NULL,
+  PRIMARY KEY (`idAnimal`),
+  CONSTRAINT `id`
+    FOREIGN KEY (`idAnimal`)
+    REFERENCES `mydb`.`Animal` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`racechien`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`racechien` (
+  `id` INT NOT NULL,
+  `nom` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `idAnimal`
+    FOREIGN KEY (`id`)
+    REFERENCES `mydb`.`Chien` (`idAnimal`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`racechat`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`racechat` (
+  `id` INT NOT NULL,
+  `nom` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `idAnimal`
+    FOREIGN KEY (`id`)
+    REFERENCES `mydb`.`chat` (`idAnimal`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`proprietaire`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`proprietaire` (
+  `id` INT NOT NULL,
+  `nom` VARCHAR(45) NULL,
+  `prenom` VARCHAR(45) NULL,
+  `rue` VARCHAR(45) NULL,
+  `codepostal` VARCHAR(45) NULL,
+  `ville` VARCHAR(45) NULL,
+  `telephone` VARCHAR(45) NULL,
+  `mobile` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `IdProprietaire`
+    FOREIGN KEY (`id`)
+    REFERENCES `mydb`.`Animal` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`visite`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`visite` (
+  `id` INT NOT NULL,
+  `datevisite` DATETIME NULL,
+  `heureViste` DATETIME NULL,
+  `raison` VARCHAR(45) NULL,
+  `idDossier` INT NULL,
+  `idAnimal` INT NULL,
+  `idVeto` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `id_idx` (`idAnimal` ASC) VISIBLE,
+  CONSTRAINT `id`
+    FOREIGN KEY (`idAnimal`)
+    REFERENCES `mydb`.`Animal` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`dossier`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`dossier` (
+  `id` INT NOT NULL,
+  `antecedent` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `idDossier`
+    FOREIGN KEY (`id`)
+    REFERENCES `mydb`.`visite` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Veto`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Veto` (
+  `id` INT NOT NULL,
+  `nom` VARCHAR(45) NULL,
+  `prenom` VARCHAR(45) NULL,
+  `telephone` VARCHAR(45) NULL,
+  `mobile` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `idVeto`
+    FOREIGN KEY (`id`)
+    REFERENCES `mydb`.`visite` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`Medicament`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`Medicament` (
+  `id` INT NOT NULL,
+  `nom` VARCHAR(45) NULL,
+  `dosage` VARCHAR(45) NULL,
+  `indication` VARCHAR(45) NULL,
+  `effet` VARCHAR(45) NULL,
+  `laboratoire` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`prescrire`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`prescrire` (
+  `idVisite` INT NOT NULL,
+  `idMedoc` INT NULL,
+  `posologie` VARCHAR(45) NULL,
+  PRIMARY KEY (`idVisite`),
+  INDEX `id_idx` (`idMedoc` ASC) VISIBLE,
+  CONSTRAINT `id`
+    FOREIGN KEY (`idVisite`)
+    REFERENCES `mydb`.`visite` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id`
+    FOREIGN KEY (`idMedoc`)
+    REFERENCES `mydb`.`Medicament` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`horaire`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`horaire` (
+  `id` INT NOT NULL,
+  `jour` DATETIME NULL,
+  `heureDebut` DATETIME NULL,
+  `heureFin` DATETIME NULL,
+  `idVeto` INT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `id_idx` (`idVeto` ASC) VISIBLE,
+  CONSTRAINT `id`
+    FOREIGN KEY (`idVeto`)
+    REFERENCES `mydb`.`Veto` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`garde`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`garde` (
+  `id` INT NOT NULL,
+  `date` DATETIME NULL,
+  `heureDebut` DATETIME NULL,
+  `heureFin` DATETIME NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `mydb`.`effectuer`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `mydb`.`effectuer` (
+  `idGarde` INT NOT NULL,
+  `idVeto` INT NULL,
+  PRIMARY KEY (`idGarde`),
+  INDEX `id_idx` (`idVeto` ASC) VISIBLE,
+  CONSTRAINT `id`
+    FOREIGN KEY (`idVeto`)
+    REFERENCES `mydb`.`Veto` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `id`
+    FOREIGN KEY (`idGarde`)
+    REFERENCES `mydb`.`garde` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+SET SQL_MODE=@OLD_SQL_MODE;
+SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
+SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
